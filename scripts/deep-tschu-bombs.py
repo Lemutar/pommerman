@@ -48,7 +48,7 @@ class PommermanModel(Model):
         metrics_in = inputs["states"]
 
         # Setup vision layers
-        with tf.name_scope("pommber_vision"):
+        with tf.name_scope("pommer_vision"):
             for i, (out_size, kernel, stride) in enumerate(convs[:-1], 1):
                 vision_in = slim.conv2d(
                     vision_in, out_size, kernel, stride, scope="conv{}".format(i)
@@ -60,7 +60,7 @@ class PommermanModel(Model):
             vision_in = tf.squeeze(vision_in, [1, 2])
 
         # Setup metrics layer
-        with tf.name_scope("pommber_metrics"):
+        with tf.name_scope("pommer_metrics"):
             metrics_in = slim.fully_connected(
                 metrics_in,
                 64,
@@ -69,7 +69,7 @@ class PommermanModel(Model):
                 scope="metrics_out",
             )
 
-        with tf.name_scope("pommber_out"):
+        with tf.name_scope("pommer_out"):
             i = 1
             last_layer = tf.concat([vision_in, metrics_in], axis=1)
             for size in hiddens:
@@ -92,7 +92,7 @@ class PommermanModel(Model):
         return output, last_layer
 
 
-ModelCatalog.register_custom_model("PommbermanModel1", PommermanModel)
+ModelCatalog.register_custom_model("PommermanModel1", PommermanModel)
 
 
 class BaseLineAgent(BaseAgent):
@@ -260,7 +260,7 @@ class MultiAgent(MultiAgentEnv):
         return {i: featurize(obs[i]) for i in self.agents_index}
 
 
-register_env("pommber_team", lambda _: MultiAgent())
+register_env("pommer_team", lambda _: MultiAgent())
 
 
 sys.setrecursionlimit(1000)
@@ -306,7 +306,7 @@ ray.init(num_gpus=0)
 def main(num_cpus, num_gpus):
     tune.run(
         PhasePPO,
-        name="pommber_cnet_0",
+        name="pommer_cnet_0",
         checkpoint_freq=10,
         local_dir="./results",
         resume=False,
@@ -314,8 +314,8 @@ def main(num_cpus, num_gpus):
         config={
             "num_workers": 2,
             "vf_share_layers": True,
-            "model": {"custom_model": "PommbermanModel1"},
-            "env": "pommber_team",
+            "model": {"custom_model": "PommermanModel1"},
+            "env": "pommer_team",
             "callbacks": {"on_train_result": tune.function(on_train_result)},
         },
         resources_per_trial={"cpu": num_cpus, "gpu": num_gpus},
