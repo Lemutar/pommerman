@@ -1,0 +1,8 @@
+git+https://github.com/MultiAgentLearning/playground@3ccc94e13dd4e3a02d1c4e283064d89e45620818
+tensorflow
+ray[rllib]
+ray[debug]
+psutil
+black
+rope
+click
