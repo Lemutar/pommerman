@@ -6,3 +6,4 @@ psutil
 black
 rope
 click
+google-api-python-client
