@@ -3,3 +3,7 @@ env/
 .vscode/
 
 results/
+
+__pycache__/
+*.py[cod]
+*.avi
