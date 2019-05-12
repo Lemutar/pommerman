@@ -127,8 +127,7 @@ setup_commands:
 
     # Install ray
     - git clone https://github.com/Lemutar/pommerman.git
-    - cd pommerman
-    - pip install -r ./requirements-cpu.txt
+    - cd pommerman && pip install -r ./requirements-cpu.txt
 
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands:
