@@ -19,7 +19,7 @@ from agents.agents import BaseLineAgent, NoDoAgent, SuicidalAgent, RandomMoveAge
 import random
 
 def featurize(obs):
-    board = obs["board"]
+    board =  np.copy(obs["board"])
     board[obs["position"][0], obs["position"][1]] = 0.0
     enemie_pos = np.full((11, 11), 0)
     for enemie in obs["enemies"]:
@@ -91,7 +91,7 @@ class MultiAgend(MultiAgentEnv):
             config["env_kwargs"]["num_items"]  = 10
             config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
-            agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
+            agents.insert(op_index, RandomMoveAgent(config["agent"](op_index, config["game_type"])))
             print(config["env_kwargs"])
             self.env = Pomme(**config["env_kwargs"])
             self.env.seed()
@@ -108,36 +108,7 @@ class MultiAgend(MultiAgentEnv):
             config["env_kwargs"]["num_items"]  = 10
             config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
-            agents.insert(op_index, RandomMoveAgent(config["agent"](op_index, config["game_type"])))
-            print(config["env_kwargs"])
-            self.env = Pomme(**config["env_kwargs"])
-            self.env.seed()
-
-        if self.phase == 3:
-            arr= [0,1]
-            random.shuffle(arr)
-            agents_index = arr.pop()
-            op_index = arr.pop()
-            self.agents_index = [agents_index]
-            self.simple_agents_index = [op_index]
-            config = ffa_v0_fast_env()
-            config["env_kwargs"]["num_wood"]  = 2
-            config["env_kwargs"]["num_items"]  = 10
-            config["env_kwargs"]["num_rigid"]  = 2
-            agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, SimpleAgent(config["agent"](op_index, config["game_type"])))
-            print(config["env_kwargs"])
-            self.env = Pomme(**config["env_kwargs"])
-            self.env.seed()
-
-        if self.phase == 4:
-            self.agents_index = [0,2]
-            self.simple_agents_index = [1,3]
-            config = team_v0_fast_env()
-            agents.insert(0, BaseLineAgent(config["agent"](0, config["game_type"])))
-            agents.insert(1, NoDoAgent(config["agent"](1, config["game_type"])))
-            agents.insert(2, BaseLineAgent(config["agent"](2, config["game_type"])))
-            agents.insert(3, NoDoAgent(config["agent"](3, config["game_type"])))
             print(config["env_kwargs"])
             self.env = Pomme(**config["env_kwargs"])
             self.env.seed()
@@ -169,10 +140,6 @@ class MultiAgend(MultiAgentEnv):
             try:
                 action = actions[index]
             except:
-                print("except")
-                print(actions)
-                print(self.agents_index )
-                print("")
                 action = 0
             assert(all_actions[index] == None)
             all_actions[index] = action

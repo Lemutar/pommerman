@@ -52,7 +52,7 @@ class Monitor(MultiAgentEnv):
         self.env = env
         self.width = 738
         self.height = 620
-        self.video_after_episodes = 200
+        self.video_after_episodes = 100
         self.observation_space = self.env.observation_space
         self.action_space = self.env.action_space
         self.start_recording = False

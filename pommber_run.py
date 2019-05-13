@@ -20,7 +20,7 @@ from ray.rllib.models import FullyConnectedNetwork, Model, ModelCatalog
 from gym.spaces import Discrete, Box
 
 
-from envs.multi_agend import MultiAgend
+from envs.multi_agend_1 import MultiAgend
 from models.pommberman import Pommberman
 import cv2
 

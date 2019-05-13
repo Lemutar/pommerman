@@ -11,13 +11,8 @@ class Pommberman(Model):
     def _build_layers_v2(self, input_dict, num_outputs, options):
 
         inputs = input_dict["obs"]
-        convs = [
-            [121, [1, 1], 4],
-            [121, [1, 1], 3],
-            [121, [1, 1], 2],
-            [121, [1, 1], 1],
-        ]
-        hiddens = [256, 256]
+        convs = [[16, [2, 2], 4], [32, [2, 2], 3], [32, [2, 2], 2], [128, [1, 1], 1]]
+        hiddens = [128, 128]
         fcnet_activation = options.get("fcnet_activation", "tanh")
         if fcnet_activation == "tanh":
             activation = tf.nn.tanh
