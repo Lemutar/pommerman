@@ -11,7 +11,7 @@ class Pommberman(Model):
     def _build_layers_v2(self, input_dict, num_outputs, options):
 
         inputs = input_dict["obs"]
-        hiddens = [256, 256]
+        hiddens = [128, 128]
         fcnet_activation = options.get("fcnet_activation", "tanh")
         if fcnet_activation == "tanh":
             activation = tf.nn.tanh
@@ -26,13 +26,13 @@ class Pommberman(Model):
             vision_in = slim.conv2d(vision_in, 24, [1, 1], scope="conv_1")
             vision_in = slim.conv2d(vision_in, 12, [1, 1], scope="conv_2")
             vision_in = slim.conv2d(vision_in, 6, [1, 1], scope="conv_3")
-            vision_in = slim.conv2d(vision_in, 1, [1, 1], scope="conv_4")
+            vision_in = slim.avg_pool2d(vision_in, 1, scope="pool_1")
             vision_in = slim.flatten(vision_in)
 
         with tf.name_scope("pommber_metrics"):
             metrics_in = slim.fully_connected(
                 metrics_in,
-                64,
+                24,
                 weights_initializer=xavier_initializer(),
                 activation_fn=activation,
                 scope="metrics_out")

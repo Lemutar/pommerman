@@ -141,6 +141,7 @@ class MultiAgend(MultiAgentEnv):
             try:
                 action = actions[index]
             except:
+                print("WWWRRROOOONNNNG")
                 action = 0
             assert(all_actions[index] == None)
             all_actions[index] = action
@@ -158,12 +159,9 @@ class MultiAgend(MultiAgentEnv):
 
     def reset(self):
         self.steps = 0
-        if self.phase != self.next_phase:
-            self.setup()
-            obs = self.env.reset()
-            self.phase = self.next_phase
-        else:
-            obs = self.env.reset()
+        self.phase = self.next_phase
+        self.setup()
+        obs = self.env.reset()
         return {i: featurize(obs[i]) for i in self.agents_index }
 
 
