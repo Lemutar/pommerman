@@ -42,7 +42,7 @@ provider:
     type: gcp
     region: us-west1
     availability_zone: us-west1-a
-    project_id: pommber  # Globally unique project id
+    project_id: tschu-bombs  # Globally unique project id
 
 # How Ray will authenticate with newly launched nodes.
 auth:
@@ -127,7 +127,7 @@ setup_commands:
 
     # Install ray
     - git clone https://github.com/Lemutar/pommerman.git
-    - cd pommerman && pip install -r ./requirements-cpu.txt
+    - cd pommerman && pip install -r ./requirements-cpu-gc.txt
 
 # Custom commands that will be run on the head node after common setup.
 head_setup_commands:

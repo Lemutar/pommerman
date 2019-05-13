@@ -76,6 +76,7 @@ class MultiAgend(MultiAgentEnv):
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
             print(config["env_kwargs"])
+            print("player id is:" + str(agents_index))
             self.env = Pomme(**config["env_kwargs"])
             self.env.seed()
 
@@ -166,4 +167,4 @@ class MultiAgend(MultiAgentEnv):
         return {i: featurize(obs[i]) for i in self.agents_index }
 
 
-register_env("pommber_team", lambda _:  Monitor(MultiAgend()))
+register_env("pommber_team", lambda _:  MultiAgend())
