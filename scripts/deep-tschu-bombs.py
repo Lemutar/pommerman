@@ -146,7 +146,7 @@ class MultiAgent(MultiAgentEnv):
         agents = []
         if self.phase == 0:
             self.agents_index = [1, 3]
-            self.simple_agents_index = [0, 2]
+            self.enemies_agents_index = [0, 2]
             config = team_v0_fast_env()
             config["env_kwargs"]["num_wood"] = 2
             config["env_kwargs"]["num_items"] = 2
@@ -159,7 +159,7 @@ class MultiAgent(MultiAgentEnv):
 
         if self.phase == 1:
             self.agents_index = [1, 3]
-            self.simple_agents_index = [0, 2]
+            self.enemies_agents_index = [0, 2]
             config = team_v0_fast_env()
             config["env_kwargs"]["num_wood"] = 2
             config["env_kwargs"]["num_items"] = 2
@@ -172,7 +172,7 @@ class MultiAgent(MultiAgentEnv):
 
         if self.phase == 2:
             self.agents_index = [1, 3]
-            self.simple_agents_index = [0, 2]
+            self.enemies_agents_index = [0, 2]
             config = team_v0_fast_env()
             config["env_kwargs"]["num_wood"] = 2
             config["env_kwargs"]["num_items"] = 2
@@ -185,7 +185,7 @@ class MultiAgent(MultiAgentEnv):
 
         if self.phase == 3:
             self.agents_index = [1, 3]
-            self.simple_agents_index = [0, 2]
+            self.enemies_agents_index = [0, 2]
             config = team_v0_fast_env()
             config["env_kwargs"]["num_wood"] = 2
             config["env_kwargs"]["num_items"] = 2
@@ -198,7 +198,7 @@ class MultiAgent(MultiAgentEnv):
 
         if self.phase == 4:
             self.agents_index = [1, 3]
-            self.simple_agents_index = [0, 2]
+            self.enemies_agents_index = [0, 2]
             config = team_v0_fast_env()
             config["env_kwargs"]["num_wood"] = 0
             config["env_kwargs"]["num_items"] = 10

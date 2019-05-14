@@ -46,11 +46,10 @@ class MultiAgend(MultiAgentEnv):
         agents = []
         if self.phase == 0:
             arr= [0,1]
-            random.shuffle(arr)
             agents_index = arr.pop()
             op_index = arr.pop()
             self.agents_index = [agents_index]
-            self.simple_agents_index = [op_index]
+            self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
             config["env_kwargs"]["num_wood"]  = 2
             config["env_kwargs"]["num_items"]  = 2
@@ -67,7 +66,7 @@ class MultiAgend(MultiAgentEnv):
             agents_index = arr.pop()
             op_index = arr.pop()
             self.agents_index = [agents_index]
-            self.simple_agents_index = [op_index]
+            self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
             config["env_kwargs"]["num_wood"]  = 2
             config["env_kwargs"]["num_items"]  = 10
@@ -84,7 +83,7 @@ class MultiAgend(MultiAgentEnv):
             agents_index = arr.pop()
             op_index = arr.pop()
             self.agents_index = [agents_index]
-            self.simple_agents_index = [op_index]
+            self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
             config["env_kwargs"]["num_wood"]  = 2
             config["env_kwargs"]["num_items"]  = 10
@@ -101,7 +100,7 @@ class MultiAgend(MultiAgentEnv):
             agents_index = arr.pop()
             op_index = arr.pop()
             self.agents_index = [agents_index]
-            self.simple_agents_index = [op_index]
+            self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
             config["env_kwargs"]["num_wood"]  = 2
             config["env_kwargs"]["num_items"]  = 10
@@ -114,7 +113,7 @@ class MultiAgend(MultiAgentEnv):
 
         if self.phase == 4:
             self.agents_index = [0,2]
-            self.simple_agents_index = [1,3]
+            self.enemies_agents_index = [1,3]
             config = team_v0_fast_env()
             agents.insert(0, BaseLineAgent(config["agent"](0, config["game_type"])))
             agents.insert(1, NoDoAgent(config["agent"](1, config["game_type"])))
@@ -142,10 +141,11 @@ class MultiAgend(MultiAgentEnv):
         self.env.close()
 
     def step(self, actions):
+        print(self.env._agents)
         self.steps = self.steps + 1
         obs = self.env.get_observations()
         all_actions = self.env.act(obs)
-        assert(len(all_actions) == len(self.agents_index) + len(self.simple_agents_index))
+        assert(len(all_actions) == len(self.agents_index) + len(self.enemies_agents_index))
         for index in self.agents_index :
             try:
                 action = actions[index]

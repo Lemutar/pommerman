@@ -80,3 +80,6 @@ def run():
     )
 
 run()
+#env = MultiAgend()
+#print(env.reset())
+#print(env.step({1:1}))

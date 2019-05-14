@@ -14,11 +14,27 @@ import gym
 from gym import spaces
 from monitoring.monitor import Monitor
 from agents.agents import BaseLineAgent, NoDoAgent, SuicidalAgent, RandomMoveAgent
-
+from pommerman.constants import Item
 
 import random
 
-def featurize(obs):
+def featurize(obs, enemies_agents_index):
+
+    enemies = []
+    for agent_id in enemies_agents_index:
+        if agent_id == 0:
+            enemies.append(Item.Agent0)
+        if agent_id == 1:
+            enemies.append(Item.Agent1)
+        if agent_id == 2:
+            enemies.append(Item.Agent2)
+        if agent_id == 3:
+            enemies.append(Item.Agent3)
+
+    for enemie in obs["enemies"]:
+        if enemie not in enemies:
+            obs["board"] = ma.masked_equal(obs["board"], enemie.value).filled(fill_value=0)
+
     board =  np.copy(obs["board"])
     board[obs["position"][0], obs["position"][1]] = 0.0
     enemie_pos = np.full((11, 11), 0)
@@ -27,7 +43,10 @@ def featurize(obs):
         board = ma.masked_equal(board, enemie.value).filled(fill_value=0)
 
     enemie_pos = (enemie_pos > 0).astype(np.float32)
+
     teammate_pos = np.full((11, 11), 0)
+
+
 
     teammate_pos = ma.masked_not_equal(board, obs["teammate"].value).filled(fill_value=0)
     teammate_pos = (teammate_pos > 0).astype(np.float32)
@@ -64,19 +83,16 @@ class MultiAgend(MultiAgentEnv):
         agents = []
         if self.phase == 0:
             arr= [0,1]
-            random.shuffle(arr)
             agents_index = arr.pop()
             op_index = arr.pop()
             self.agents_index = [agents_index]
-            self.simple_agents_index = [op_index]
+            self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
             config["env_kwargs"]["num_wood"]  = 2
             config["env_kwargs"]["num_items"]  = 2
             config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
-            print(config["env_kwargs"])
-            print("player id is:" + str(agents_index))
             self.env = Pomme(**config["env_kwargs"])
             self.env.seed()
 
@@ -86,14 +102,13 @@ class MultiAgend(MultiAgentEnv):
             agents_index = arr.pop()
             op_index = arr.pop()
             self.agents_index = [agents_index]
-            self.simple_agents_index = [op_index]
+            self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
             config["env_kwargs"]["num_wood"]  = 2
             config["env_kwargs"]["num_items"]  = 10
             config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, RandomMoveAgent(config["agent"](op_index, config["game_type"])))
-            print(config["env_kwargs"])
             self.env = Pomme(**config["env_kwargs"])
             self.env.seed()
 
@@ -103,14 +118,13 @@ class MultiAgend(MultiAgentEnv):
             agents_index = arr.pop()
             op_index = arr.pop()
             self.agents_index = [agents_index]
-            self.simple_agents_index = [op_index]
+            self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
             config["env_kwargs"]["num_wood"]  = 2
             config["env_kwargs"]["num_items"]  = 10
             config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, SimpleAgent(config["agent"](op_index, config["game_type"])))
-            print(config["env_kwargs"])
             self.env = Pomme(**config["env_kwargs"])
             self.env.seed()
 
@@ -134,7 +148,7 @@ class MultiAgend(MultiAgentEnv):
         self.steps = self.steps + 1
         obs = self.env.get_observations()
         all_actions = self.env.act(obs)
-        assert(len(all_actions) == len(self.agents_index) + len(self.simple_agents_index))
+        assert(len(all_actions) == len(self.agents_index) + len(self.enemies_agents_index))
 
 
         for index in self.agents_index :
@@ -149,7 +163,7 @@ class MultiAgend(MultiAgentEnv):
         step_obs = self.env.step(all_actions)
         obs, rew, done, info = {}, {}, {}, {}
         for i in actions.keys():
-            obs[i], rew[i], done[i], info[i] = [featurize(step_obs[0][i]),
+            obs[i], rew[i], done[i], info[i] = [featurize(step_obs[0][i], self.enemies_agents_index ),
                                                 step_obs[1][i],
                                                 step_obs[1][i] == -1 or step_obs[2],
                                                 step_obs[3]]
@@ -162,7 +176,7 @@ class MultiAgend(MultiAgentEnv):
         self.phase = self.next_phase
         self.setup()
         obs = self.env.reset()
-        return {i: featurize(obs[i]) for i in self.agents_index }
+        return {i: featurize(obs[i], self.enemies_agents_index) for i in self.agents_index }
 
 
-register_env("pommber_team", lambda _:  MultiAgend())
+register_env("pommber_team", lambda _:  Monitor(MultiAgend()))
