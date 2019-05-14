@@ -35,7 +35,7 @@ def featurize(obs, enemies_agents_index):
         if enemie not in enemies:
             obs["board"] = ma.masked_equal(obs["board"], enemie.value).filled(fill_value=0)
 
-    board =  np.copy(obs["board"])
+    board = np.copy(obs["board"])
     board[obs["position"][0], obs["position"][1]] = 0.0
     enemie_pos = np.full((11, 11), 0)
     for enemie in obs["enemies"]:
@@ -45,8 +45,6 @@ def featurize(obs, enemies_agents_index):
     enemie_pos = (enemie_pos > 0).astype(np.float32)
 
     teammate_pos = np.full((11, 11), 0)
-
-
 
     teammate_pos = ma.masked_not_equal(board, obs["teammate"].value).filled(fill_value=0)
     teammate_pos = (teammate_pos > 0).astype(np.float32)
@@ -67,7 +65,7 @@ def featurize(obs, enemies_agents_index):
     can_kick = utility.make_np_float([obs["can_kick"]])
 
 
-    return {'boards': np.stack([board, bomb_blast_strength, bomb_life, pos, teammate_pos, enemie_pos]),
+    return {'boards': np.stack([board, pos, enemie_pos,teammate_pos, bomb_blast_strength, bomb_life]),
             'states': np.concatenate([ammo, blast_strength, can_kick]),}
 
 

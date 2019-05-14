@@ -77,9 +77,6 @@ def run():
                 "on_train_result": tune.function(on_train_result),
             },
         },
-        resources_per_trial={
-            "cpu": 2,
-        },
     )
 
 run()

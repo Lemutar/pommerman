@@ -3,7 +3,7 @@ cluster_name: default
 
 # The minimum number of workers nodes to launch in addition to the head
 # node. This number should be >= 0.
-min_workers: 0
+min_workers: 2
 
 # The maximum number of workers nodes to launch in addition to the head
 # node. This takes precedence over min_workers.
@@ -58,7 +58,7 @@ auth:
 # For more documentation on available fields, see:
 # https://cloud.google.com/compute/docs/reference/rest/v1/instances/insert
 head_node:
-    machineType: n1-standard-2
+    machineType: n1-standard-4
     disks:
       - boot: true
         autoDelete: true
@@ -132,7 +132,7 @@ setup_commands:
       git clone https://github.com/Lemutar/pommerman.git &&
       cd pommerman &&
       pip install -r ./requirements-cpu.txt &&
-      pip install lz4 --upgrade
+      pip install dask --upgrade
 
 
 # Custom commands that will be run on the head node after common setup.
