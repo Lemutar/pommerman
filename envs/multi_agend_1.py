@@ -83,6 +83,7 @@ class MultiAgend(MultiAgentEnv):
         agents = []
         if self.phase == 0:
             arr= [0,1]
+            random.shuffle(arr)
             agents_index = arr.pop()
             op_index = arr.pop()
             self.agents_index = [agents_index]
@@ -179,4 +180,4 @@ class MultiAgend(MultiAgentEnv):
         return {i: featurize(obs[i], self.enemies_agents_index) for i in self.agents_index }
 
 
-register_env("pommber_team", lambda _:  Monitor(MultiAgend()))
+register_env("pommber_team", lambda _:  MultiAgend())
