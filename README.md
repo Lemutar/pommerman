@@ -29,3 +29,16 @@ pip install -r ./requirements-cpu.txt
 # for running with GPU
 pip install -r ./requirements-gpu.txt
 ```
+
+## Setup for gc ray cluster
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS=<your cred file>
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+ray up ./gc-ray-setup.yaml
+
+ray exec ./gc-ray-setup.yaml 'python ./pommerman/pommber_run_gc.py'
+
+ray down gc-ray-setup.yaml
+```
