@@ -67,8 +67,9 @@ def run():
         checkpoint_freq=10,
         local_dir="./results",
         config={
-            "num_cpus_per_worker": 2,
-            "num_workers": 5,
+            "num_cpus_for_driver": 6,
+            "num_cpus_per_worker": 8,
+            "num_workers": 1,
             "vf_share_layers":True,
             "model": {
                  "custom_model": "Pommberman"},
