@@ -48,6 +48,8 @@ def on_train_result(info):
         trainer.train_phase  = 3
     elif result["episode_reward_mean"] > 0.95 and trainer.train_phase == 3:
         trainer.train_phase  = 4
+    elif result["episode_reward_mean"] > 0.95 and trainer.train_phase == 4:
+        trainer.train_phase  = 5
 
 
     phase = trainer.train_phase
@@ -63,7 +65,7 @@ def run():
 
     tune.run(
         PhasePPO,
-        name="pommber_cm_1",
+        name="pommber_cm_3",
         checkpoint_freq=10,
         local_dir="./results",
         resume=True,

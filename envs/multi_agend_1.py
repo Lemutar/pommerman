@@ -104,7 +104,7 @@ class MultiAgend(MultiAgentEnv):
             self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
             config["env_kwargs"]["num_wood"]  = 10
-            config["env_kwargs"]["num_items"]  = 10
+            config["env_kwargs"]["num_items"]  = 2
             config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
@@ -119,12 +119,64 @@ class MultiAgend(MultiAgentEnv):
             self.agents_index = [agents_index]
             self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
-            config["env_kwargs"]["num_wood"]  = 20
-            config["env_kwargs"]["num_items"]  = 10
+            config["env_kwargs"]["num_wood"]  = 14
+            config["env_kwargs"]["num_items"]  = 2
             config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
             self.env = Pomme(**config["env_kwargs"])
+            print(config["env_kwargs"])
+            self.env.seed()
+
+        if self.phase == 3:
+            arr= [0,1]
+            random.shuffle(arr)
+            agents_index = arr.pop()
+            op_index = arr.pop()
+            self.agents_index = [agents_index]
+            self.enemies_agents_index = [op_index]
+            config = ffa_v0_fast_env()
+            config["env_kwargs"]["num_wood"]  = 16
+            config["env_kwargs"]["num_items"]  = 2
+            config["env_kwargs"]["num_rigid"]  = 2
+            agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
+            agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
+            self.env = Pomme(**config["env_kwargs"])
+            print(config["env_kwargs"])
+            self.env.seed()
+
+        if self.phase == 4:
+            arr= [0,1]
+            random.shuffle(arr)
+            agents_index = arr.pop()
+            op_index = arr.pop()
+            self.agents_index = [agents_index]
+            self.enemies_agents_index = [op_index]
+            config = ffa_v0_fast_env()
+            config["env_kwargs"]["num_wood"]  = 18
+            config["env_kwargs"]["num_items"]  = 2
+            config["env_kwargs"]["num_rigid"]  = 2
+            agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
+            agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
+            self.env = Pomme(**config["env_kwargs"])
+            print(config["env_kwargs"])
+            self.env.seed()
+
+        if self.phase == 5:
+            arr= [0,1]
+            random.shuffle(arr)
+            agents_index = arr.pop()
+            op_index = arr.pop()
+            self.agents_index = [agents_index]
+            self.enemies_agents_index = [op_index]
+            config = ffa_v0_fast_env()
+            config["env_kwargs"]["num_wood"]  = 20
+            config["env_kwargs"]["num_items"]  = 2
+            config["env_kwargs"]["num_rigid"]  = 2
+            agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
+            agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
+            self.env = Pomme(**config["env_kwargs"])
+            print(config["env_kwargs"])
             self.env.seed()
 
         self.agents_test = agents

@@ -131,7 +131,7 @@ setup_commands:
     - >-
       git clone https://github.com/Lemutar/pommerman.git &&
       cd pommerman &&
-      pip install -r ./requirements-cpu.txt &&
+      pip install -r ./requirements-cpu-cg.txt &&
       pip install dask --upgrade
 
 
