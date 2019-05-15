@@ -23,7 +23,8 @@ class Pommberman(Model):
 
         with tf.name_scope("pommber_vision"):
             vision_in = tf.transpose(vision_in, [0, 2, 3, 1])
-            vision_in = slim.conv2d(vision_in, 32, [3, 3],1, scope="conv_3")
+            vision_in = slim.conv2d(vision_in, 16, [3, 3],1, scope="conv_1")
+            vision_in = slim.conv2d(vision_in, 32, [3, 3],1, scope="conv_2")
             vision_in = slim.flatten(vision_in)
 
         with tf.name_scope("pommber_metrics"):

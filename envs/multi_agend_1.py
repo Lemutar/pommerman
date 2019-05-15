@@ -103,11 +103,11 @@ class MultiAgend(MultiAgentEnv):
             self.agents_index = [agents_index]
             self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
-            config["env_kwargs"]["num_wood"]  = 2
+            config["env_kwargs"]["num_wood"]  = 10
             config["env_kwargs"]["num_items"]  = 10
             config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
-            agents.insert(op_index, RandomMoveAgent(config["agent"](op_index, config["game_type"])))
+            agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
             self.env = Pomme(**config["env_kwargs"])
             self.env.seed()
 
@@ -119,11 +119,11 @@ class MultiAgend(MultiAgentEnv):
             self.agents_index = [agents_index]
             self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
-            config["env_kwargs"]["num_wood"]  = 2
+            config["env_kwargs"]["num_wood"]  = 20
             config["env_kwargs"]["num_items"]  = 10
             config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
-            agents.insert(op_index, SimpleAgent(config["agent"](op_index, config["game_type"])))
+            agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
             self.env = Pomme(**config["env_kwargs"])
             self.env.seed()
 

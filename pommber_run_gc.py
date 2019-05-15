@@ -67,8 +67,8 @@ def run():
         checkpoint_freq=10,
         local_dir="./results",
         config={
-            "monitor": True,
-            "num_workers": 2,
+            "num_cpus_per_worker": 2,
+            "num_workers": 5,
             "vf_share_layers":True,
             "model": {
                  "custom_model": "Pommberman"},

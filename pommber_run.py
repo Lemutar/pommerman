@@ -63,9 +63,10 @@ def run():
 
     tune.run(
         PhasePPO,
-        name="pommber_cm",
+        name="pommber_cm_1",
         checkpoint_freq=10,
         local_dir="./results",
+        resume=True,
         config={
             "monitor": True,
             "num_workers": 2,
