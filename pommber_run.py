@@ -65,16 +65,15 @@ def run():
 
     tune.run(
         PhasePPO,
-        name="pommber_cm_3",
+        name="pommber_cm_lstm",
         checkpoint_freq=10,
         local_dir="./results",
-        resume=True,
         config={
             "monitor": True,
             "num_workers": 2,
             "vf_share_layers":True,
             "model": {
-                 "custom_model": "Pommberman"},
+                 "custom_model": "pommberman_lstm"},
             "env": "pommber_team",
             "callbacks": {
                 "on_train_result": tune.function(on_train_result),
