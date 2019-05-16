@@ -2,7 +2,6 @@
 from pommerman.agents import SimpleAgent
 from pommerman.configs import ffa_v0_fast_env, team_v0_fast_env
 from pommerman.envs.v0 import Pomme
-from pommerman.characters import Bomber
 from pommerman import utility
 
 from ray.rllib.env.multi_agent_env import MultiAgentEnv
@@ -10,9 +9,7 @@ from ray.tune.registry import register_env
 
 import numpy as np
 import numpy.ma as ma
-import gym
 from gym import spaces
-from monitoring.monitor import Monitor
 from agents.agents import BaseLineAgent, NoDoAgent, SuicidalAgent, RandomMoveAgent
 from pommerman.constants import Item
 
@@ -42,6 +39,15 @@ def featurize(obs, enemies_agents_index):
         enemie_pos = enemie_pos | ma.masked_not_equal(board, enemie.value).filled(fill_value=0)
         board = ma.masked_equal(board, enemie.value).filled(fill_value=0)
 
+    wood = ma.masked_not_equal(board, 2).filled(fill_value=0)   
+    wood = (wood > 0).astype(np.float32)
+    board = ma.masked_equal(board, 2).filled(fill_value=0)
+
+    stone = ma.masked_not_equal(board, 1).filled(fill_value=0)   
+    stone = (stone > 0).astype(np.float32)
+    board = ma.masked_equal(board, 1).filled(fill_value=0)
+  
+
     enemie_pos = (enemie_pos > 0).astype(np.float32)
 
     teammate_pos = np.full((11, 11), 0)
@@ -49,7 +55,7 @@ def featurize(obs, enemies_agents_index):
     teammate_pos = ma.masked_not_equal(board, obs["teammate"].value).filled(fill_value=0)
     teammate_pos = (teammate_pos > 0).astype(np.float32)
     board = ma.masked_equal(board, obs["teammate"].value).filled(fill_value=0)
-    board = board.astype(np.float32)
+    items = board.astype(np.float32)
 
     pos = np.full((11, 11), 0)
     pos[obs["position"][0], obs["position"][1]] = 1.0
@@ -65,7 +71,7 @@ def featurize(obs, enemies_agents_index):
     can_kick = utility.make_np_float([obs["can_kick"]])
 
 
-    return {'boards': np.stack([board, pos, enemie_pos,teammate_pos, bomb_blast_strength, bomb_life]),
+    return {'boards': np.stack([stone, wood,items, pos, enemie_pos,teammate_pos, bomb_blast_strength, bomb_life]),
             'states': np.concatenate([ammo, blast_strength, can_kick]),}
 
 
@@ -89,7 +95,7 @@ class MultiAgend(MultiAgentEnv):
             config = ffa_v0_fast_env()
             config["env_kwargs"]["num_wood"]  = 2
             config["env_kwargs"]["num_items"]  = 2
-            config["env_kwargs"]["num_rigid"]  = 2
+            config["env_kwargs"]["num_rigid"]  = 0
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
             self.env = Pomme(**config["env_kwargs"])
@@ -103,8 +109,8 @@ class MultiAgend(MultiAgentEnv):
             self.agents_index = [agents_index]
             self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
-            config["env_kwargs"]["num_wood"]  = 10
-            config["env_kwargs"]["num_items"]  = 2
+            config["env_kwargs"]["num_wood"]  = 20
+            config["env_kwargs"]["num_items"]  = 20
             config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
@@ -119,13 +125,9 @@ class MultiAgend(MultiAgentEnv):
             self.agents_index = [agents_index]
             self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
-            config["env_kwargs"]["num_wood"]  = 14
-            config["env_kwargs"]["num_items"]  = 2
-            config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
             self.env = Pomme(**config["env_kwargs"])
-            print(config["env_kwargs"])
             self.env.seed()
 
         if self.phase == 3:
@@ -136,9 +138,6 @@ class MultiAgend(MultiAgentEnv):
             self.agents_index = [agents_index]
             self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
-            config["env_kwargs"]["num_wood"]  = 16
-            config["env_kwargs"]["num_items"]  = 2
-            config["env_kwargs"]["num_rigid"]  = 2
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
             self.env = Pomme(**config["env_kwargs"])
@@ -182,7 +181,7 @@ class MultiAgend(MultiAgentEnv):
         self.agents_test = agents
         self.env.set_agents(agents)
         self.env.set_init_game_state(None)
-        self.observation_space = spaces.Dict({'boards': spaces.Box(low=-1, high=25, shape=(6, 11,11), dtype=np.float32),
+        self.observation_space = spaces.Dict({'boards': spaces.Box(low=-1, high=25, shape=(8, 11,11), dtype=np.float32),
                                               'states': spaces.Box(low=-1, high=25, shape=(3,), dtype=np.float32),})
 
         self.action_space = self.env.action_space

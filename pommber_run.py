@@ -1,30 +1,13 @@
-import os
-import sys
-
-import pickle
-import resource
 import sys
 import ray
 
-
-
-from ray.rllib.env.multi_agent_env import MultiAgentEnv
-from ray.tune.registry import register_env
 from ray.rllib.agents.ppo import PPOAgent
 from ray import tune
-import tensorflow as tf
-import tensorflow.contrib.slim as slim
-from tensorflow.contrib.layers import xavier_initializer
-
-from ray.rllib.models import FullyConnectedNetwork, Model, ModelCatalog
-from gym.spaces import Discrete, Box
-
 
 from envs.multi_agend_1 import MultiAgend
-from models.pommberman import Pommberman
-import cv2
-
-
+import models.pommberman_lstm
+import models.pommberman
+import matplotlib.pyplot as plt
 
 
 class PhasePPO(PPOAgent):
@@ -33,9 +16,6 @@ class PhasePPO(PPOAgent):
         super(PhasePPO, self).__init__(config=config,env=env, logger_creator=logger_creator)
         self.train_phase = 0
 
-def on_episode_end(info):
-    env = info["env"]
-    episode.custom_metrics["train_phase"] = env.get_phase()
 
 def on_train_result(info):
     trainer = info["trainer"]
@@ -73,7 +53,7 @@ def run():
             "num_workers": 2,
             "vf_share_layers":True,
             "model": {
-                 "custom_model": "pommberman_lstm"},
+                 "custom_model": "pommberman"},
             "env": "pommber_team",
             "callbacks": {
                 "on_train_result": tune.function(on_train_result),
@@ -84,4 +64,10 @@ def run():
 run()
 #env = MultiAgend()
 #print(env.reset())
-#print(env.step({1:1}))
+
+
+#f, x = plt.subplots(1,8,figsize=(16, 2))
+#for i, board in enumerate(env.step({1:0})[0][1]['boards']):
+#    x[i].imshow(board)
+#    x[i].axis("off")    
+#plt.show()

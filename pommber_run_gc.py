@@ -1,30 +1,12 @@
-import os
-import sys
-
-import pickle
-import resource
 import sys
 import ray
 
-
-
-from ray.rllib.env.multi_agent_env import MultiAgentEnv
-from ray.tune.registry import register_env
 from ray.rllib.agents.ppo import PPOAgent
 from ray import tune
-import tensorflow as tf
-import tensorflow.contrib.slim as slim
-from tensorflow.contrib.layers import xavier_initializer
-
-from ray.rllib.models import FullyConnectedNetwork, Model, ModelCatalog
-from gym.spaces import Discrete, Box
-
 
 from envs.multi_agend_1 import MultiAgend
-from models.pommberman import Pommberman
-import cv2
-
-
+import models.pommberman_lstm
+import models.pommberman
 
 
 class PhasePPO(PPOAgent):
@@ -33,9 +15,6 @@ class PhasePPO(PPOAgent):
         super(PhasePPO, self).__init__(config=config,env=env, logger_creator=logger_creator)
         self.train_phase = 0
 
-def on_episode_end(info):
-    env = info["env"]
-    episode.custom_metrics["train_phase"] = env.get_phase()
 
 def on_train_result(info):
     trainer = info["trainer"]
@@ -67,12 +46,10 @@ def run():
         checkpoint_freq=10,
         local_dir="./results",
         config={
-            "num_cpus_for_driver": 6,
-            "num_cpus_per_worker": 8,
-            "num_workers": 1,
+            "num_workers": 16,
             "vf_share_layers":True,
             "model": {
-                 "custom_model": "Pommberman"},
+                 "custom_model": "pommberman_lstm"},
             "env": "pommber_team",
             "callbacks": {
                 "on_train_result": tune.function(on_train_result),
