@@ -50,23 +50,29 @@ class Pommberman(Model):
 
         with tf.name_scope("pommber_vision"):
             vision_in = tf.transpose(vision_in, [0, 2, 3, 1])
-            vision_in = slim.conv2d(vision_in, 32, [3, 3],1, scope="conv_1")
-            vision_in = slim.conv2d(vision_in, 6, [5, 5],1, scope="conv_2")
+            vision_in = slim.conv2d(vision_in, 32, [3, 3], 1, scope="conv_1")
+            vision_in = slim.conv2d(vision_in, 16, [3, 3], 1, scope="conv_2")
+            vision_in = slim.conv2d(vision_in, 6, [3, 3], 1, scope="conv_3")
             vision_in = slim.flatten(vision_in)
 
         with tf.name_scope("pommber_metrics"):
             metrics_in = slim.fully_connected(
                 metrics_in,
-                24,
+                12,
                 weights_initializer=xavier_initializer(),
                 activation_fn=activation,
                 scope="metrics_out")
 
         with tf.name_scope("pommber_out"):
             last_layer = tf.concat([vision_in, metrics_in], axis=1)
-            print("AAAAAAAAAAA" + str(last_layer.shape))
+            last_layer = slim.fully_connected(
+                last_layer,
+                128,
+                weights_initializer=xavier_initializer(),
+                activation_fn=activation,
+                scope="middel")
 
-            cell_size = 128
+            cell_size = 64
             last_layer = add_time_dimension(last_layer, self.seq_lens)
             lstm = tf.nn.rnn_cell.LSTMCell(cell_size, state_is_tuple=True)
             self.state_init = [
@@ -94,6 +100,7 @@ class Pommberman(Model):
                 dtype=tf.float32)
 
             self.state_out = list(lstm_state)
+
             last_layer = tf.reshape(lstm_out, [-1, cell_size])
             output = slim.fully_connected(
                 last_layer,
@@ -102,7 +109,6 @@ class Pommberman(Model):
                 activation_fn=None,
                 scope="fc_out")
 
-        writer = tf.summary.FileWriter('./results/pommber_cm_lstm', tf.get_default_graph())
         return output, last_layer
 
 

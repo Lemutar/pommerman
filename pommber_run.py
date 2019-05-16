@@ -49,11 +49,10 @@ def run():
         checkpoint_freq=10,
         local_dir="./results",
         config={
-            "monitor": True,
             "num_workers": 2,
             "vf_share_layers":True,
             "model": {
-                 "custom_model": "pommberman"},
+                 "custom_model": "pommberman_lstm"},
             "env": "pommber_team",
             "callbacks": {
                 "on_train_result": tune.function(on_train_result),
@@ -63,11 +62,11 @@ def run():
 
 run()
 #env = MultiAgend()
+#env.set_phase(1)
 #print(env.reset())
-
 
 #f, x = plt.subplots(1,8,figsize=(16, 2))
 #for i, board in enumerate(env.step({1:0})[0][1]['boards']):
 #    x[i].imshow(board)
-#    x[i].axis("off")    
+#    x[i].axis("off")
 #plt.show()
