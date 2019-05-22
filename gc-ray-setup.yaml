@@ -58,7 +58,7 @@ auth:
 # For more documentation on available fields, see:
 # https://cloud.google.com/compute/docs/reference/rest/v1/instances/insert
 head_node:
-    machineType: n1-standard-2
+    machineType: n1-standard-8
     disks:
       - boot: true
         autoDelete: true
@@ -81,11 +81,7 @@ head_node:
     #     aliasIpRanges: []
 
 worker_nodes:
-    machineType: n1-standard-2
-    guestAccelerators:
-      - acceleratorType: nvidia-tesla-K80,
-        acceleratorCount: 1
-
+    machineType: n1-standard-8
     disks:
       - boot: true
         autoDelete: true

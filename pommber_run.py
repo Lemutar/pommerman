@@ -4,8 +4,7 @@ import ray
 from ray.rllib.agents.ppo import PPOAgent
 from ray import tune
 
-from envs.multi_agend_1 import MultiAgend
-import models.pommberman_lstm
+from envs.multi_agend import MultiAgend
 import models.pommberman
 import matplotlib.pyplot as plt
 
@@ -45,14 +44,22 @@ def run():
 
     tune.run(
         PhasePPO,
-        name="pommber_cm_lstm",
+        name="pommber_cm_46",
         checkpoint_freq=10,
         local_dir="./results",
+        resume=True,
         config={
             "num_workers": 2,
-            "vf_share_layers":True,
+            "lr": 5e-4,
+            "num_envs_per_worker": 10,
+            "observation_filter": "MeanStdFilter",
+            "batch_mode": "complete_episodes",
+            "train_batch_size": 16000,
+            "sgd_minibatch_size": 500,
+            "entropy_coeff": 0.01,
+            "lambda": 0.95,
             "model": {
-                 "custom_model": "pommberman_lstm"},
+                 "custom_model": "pommberman"},
             "env": "pommber_team",
             "callbacks": {
                 "on_train_result": tune.function(on_train_result),

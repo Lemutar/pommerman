@@ -6,28 +6,26 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 from tensorflow.contrib.layers import xavier_initializer
 
+
 class Pommberman(Model):
 
     def _build_layers_v2(self, input_dict, num_outputs, options):
 
         inputs = input_dict["obs"]
-        hiddens = [128, 128]
-        fcnet_activation = options.get("fcnet_activation", "tanh")
-        if fcnet_activation == "tanh":
-            activation = tf.nn.tanh
-        elif fcnet_activation == "relu":
-            activation = tf.nn.relu
+        hiddens = [256]
+        activation = tf.nn.relu
 
         vision_in = inputs['boards']
         metrics_in = inputs['states']
 
         with tf.name_scope("pommber_vision"):
             vision_in = tf.transpose(vision_in, [0, 2, 3, 1])
-            vision_in = slim.conv2d(vision_in, 32, [3, 3], 1, scope="conv_1")
-            vision_in = slim.conv2d(vision_in, 16, [3, 3], 1, scope="conv_2")
-            vision_in = slim.conv2d(vision_in, 6, [3, 3], 1, scope="conv_3")
-            vision_in = slim.flatten(vision_in)
-            print("DDDDDDDDDDD", vision_in.shape)
+            vision_in = slim.conv2d(vision_in, 32, 3, 1, padding="valid", scope="conv_1")
+            vision_in = slim.conv2d(vision_in, 64, 3, 1, padding="valid", scope="conv_2")
+            vision_in = slim.conv2d(vision_in, 128, 3, 1, padding="valid", scope="conv_3")
+            vision_in = slim.conv2d(vision_in, 256, 3, 1, padding="valid", scope="conv_4")
+            vision_in = tf.layers.flatten(vision_in)
+
 
         with tf.name_scope("pommber_metrics"):
             metrics_in = slim.fully_connected(
