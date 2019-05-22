@@ -131,8 +131,9 @@ setup_commands:
     - >-
       git clone https://github.com/Lemutar/pommerman.git &&
       cd pommerman &&
-      pip install -r ./requirements-cpu-gc.txt &&
-      pip install dask --upgrade
+      pip install -r ./requirements-cpu.txt &&
+      pip install dask --upgrade &&
+      pip install scipy==1.2.1
 
 
 # Custom commands that will be run on the head node after common setup.

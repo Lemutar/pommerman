@@ -46,7 +46,7 @@ def run():
         checkpoint_freq=10,
         local_dir="./results",
         config={
-            "num_workers": 24,
+            "num_workers": 22,
             "lr": 5e-4,
             "num_envs_per_worker": 10,
             "observation_filter": "MeanStdFilter",
