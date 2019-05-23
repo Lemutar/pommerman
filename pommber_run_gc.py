@@ -46,14 +46,14 @@ def run():
         checkpoint_freq=10,
         local_dir="./results",
         config={
-            "num_workers": 20,
-            "num_cpus_for_driver": 3,
+            "num_workers": 10,
+            "num_gpus": 1,
             "lr": 5e-4,
             "num_envs_per_worker": 10,
             "observation_filter": "MeanStdFilter",
             "batch_mode": "complete_episodes",
-            "train_batch_size": 16000,
-            "sgd_minibatch_size": 500,
+            "train_batch_size": 32000,
+            "sgd_minibatch_size": 1000,
             "entropy_coeff": 0.01,
             "lambda": 0.95,
             "model": {
