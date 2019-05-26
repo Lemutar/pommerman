@@ -12,11 +12,11 @@ class Pommberman(Model):
     def _build_layers_v2(self, input_dict, num_outputs, options):
 
         inputs = input_dict["obs"]
-        hiddens = [256,128]
+        hiddens = [256]
         activation = tf.nn.relu
         vision_in = inputs['boards']
         with tf.name_scope("pommber_vision"):
-            vision_in = slim.conv2d(vision_in, 64, 1, 1, padding="valid", scope="conv_1")
+            vision_in = slim.conv2d(vision_in, 32, 1, 1, padding="valid", scope="conv_1")
             #vision_in = slim.conv2d(vision_in, 64, 3, 1, padding="valid", scope="conv_2")
             #vision_in = slim.conv2d(vision_in, 64, 3, 1, padding="valid", scope="conv_3")
             #vision_in = slim.conv2d(vision_in, 64, 3, 1, padding="valid", scope="conv_4")

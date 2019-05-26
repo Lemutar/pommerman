@@ -5,6 +5,7 @@ from ray.rllib.agents.ppo import PPOAgent
 from ray import tune
 
 from envs.multi_agend import MultiAgend
+
 import models.pommberman_lstm
 import models.pommberman
 import matplotlib.pyplot as plt
@@ -46,21 +47,19 @@ def run():
     ray.init(num_gpus=1)
     tune.run(
         PhasePPO,
-        name="pommber_cm_lstm_103",
+        name="pommber_cm_lstm_111",
         checkpoint_freq=10,
         local_dir="./results",
-        resume=True,
         config={
-            "num_workers": 7,
+            "num_workers": 15,
             "num_gpus": 1,
+            "num_envs_per_worker": 16,
             "observation_filter": "MeanStdFilter",
             "batch_mode": "complete_episodes",
-            "train_batch_size": 32000,
-            "sgd_minibatch_size": 3200,
+            "train_batch_size": 16000,
+            "sgd_minibatch_size": 1600,
             "vf_share_layers": True,
-            "kl_target":0.,
-            "kl_coeff":0.5,
-            "lr": .0001,
+            "lr": 5e-4,
             "gamma": 0.997,
             "model": {
                  "use_lstm": True,
@@ -77,22 +76,20 @@ def run():
 def test():
     env = MultiAgend()
     env.set_phase(0)
-    print(env.reset())
-    p = 1
-    env.step({p:5})
-    env.step({p:3})
-    env.step({p:4})
-    env.step({p:4})
-    env.step({p:4})
-    env.step({p:4})
-    env.step({p:4})
-    env.step({p:4})
-    env.step({p:4})
+    p = env.agents_index[0]
+    f, x = plt.subplots(1,13,figsize=(26, 2))
 
-    f, x = plt.subplots(1,9,figsize=(18, 2))
+    env.step({p:5})
+    env.step({p:0})
+    env.step({p:0})
+    env.step({p:0})
+    env.step({p:0})
+    env.step({p:0})
+    env.step({p:2})
+    env.step({p:2})
     for i, board in enumerate(env.step({p:0})[0][p]['boards']):
         x[i].imshow(board)
         x[i].axis("off")
     plt.show()
 
-run()
+test()

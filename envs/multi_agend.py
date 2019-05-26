@@ -13,6 +13,8 @@ from gym import spaces
 from agents.agents import BaseLineAgent, NoDoAgent, SuicidalAgent, RandomMoveAgent, Curiosity
 from pommerman.constants import Item, DEFAULT_BOMB_LIFE
 from monitoring.monitor import Monitor
+import json
+import copy
 
 import random
 
@@ -76,8 +78,8 @@ def featurize(obs, enemies_agents_index, steps):
 
 
     bomb_blast_strength = obs["bomb_blast_strength"].astype(np.float32)
-    bomb_life = obs["bomb_life"].astype(np.float32)
-    bomb_life = np.where(bomb_life == 0, bomb_life, (bomb_life - DEFAULT_BOMB_LIFE) /  DEFAULT_BOMB_LIFE)
+    bomb_life = np.copy(obs["bomb_life"]).astype(np.float32)
+    bomb_life = game_end = np.full((11, 11), 0) #np.where(bomb_life == 0, bomb_life, (bomb_life - DEFAULT_BOMB_LIFE) /  DEFAULT_BOMB_LIFE)
 
     game_end = (200. - steps) / 200.
     game_end = np.full((11, 11), game_end)
@@ -101,10 +103,8 @@ def featurize(obs, enemies_agents_index, steps):
                                 ammo,
                                 can_kick,
                                 blast_strength,
-                                game_end], axis=2)}
+                                game_end], axis=0)}
 
-    return {'boards': np.stack([stone, wood,items, pos, enemie_pos,teammate_pos, bomb_blast_strength, bomb_life]),
-            'states': np.concatenate([ammo, blast_strength, can_kick]),}
 
 class MultiAgend(MultiAgentEnv):
     def __init__(self):
@@ -112,27 +112,33 @@ class MultiAgend(MultiAgentEnv):
         self.phase = 0
         self.next_phase = 0
         self.steps = 0
-        self.curiosity = Curiosity(self)
         self.setup()
 
     def setup(self):
         agents = []
         if self.phase == 0:
-            arr= [0,1]
+            arr= [1,0]
             random.shuffle(arr)
             agents_index = arr.pop()
             op_index = arr.pop()
             self.agents_index = [agents_index]
             self.enemies_agents_index = [op_index]
             config = ffa_v0_fast_env()
-            config["env_kwargs"]["num_wood"]  = 0
-            config["env_kwargs"]["num_items"]  = 0
-            config["env_kwargs"]["num_rigid"]  = 0
-            config["env_kwargs"]["max_steps"]  = 200
             agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
             agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
             self.env = Pomme(**config["env_kwargs"])
-            self.env.seed()
+            init_state = {'board_size': '11', 'step_count': '0', 'board': '[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 10, 0, 0, 2, 2, 2, 0, 0, 13, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0], [0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0], [0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [11, 3, 0, 0, 2, 2, 2, 0, 0, 12, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]', 'agents': '[{"agent_id": 0, "is_alive": true, "position": [1, 1], "ammo": 1, "blast_strength": 2, "can_kick": false}, {"agent_id": 1, "is_alive": true, "position": [9, 0], "ammo": 0, "blast_strength": 2, "can_kick": false}]', 'bombs': '[]', 'flames': '[]', 'items': '[]', 'intended_actions': '[0, 0]'}
+            board = np.full((11, 11), 0).tolist()
+            init_state['board'] = json.dumps(board)
+            agents_json = json.loads(copy.copy(init_state['agents']))
+            for agent in agents_json:
+              agent_pos = [random.randint(0, 10), random.randint(0, 10)]
+              agent["position"] = agent_pos
+            init_state['agents'] = json.dumps(agents_json)
+            self.env.set_agents(agents)
+            self.env._init_game_state = init_state
+            self.env.reset()
+
 
         if self.phase == 1:
             arr= [0,1]
@@ -196,13 +202,12 @@ class MultiAgend(MultiAgentEnv):
             print(config["env_kwargs"])
             self.env.seed()
 
-        self.agents_test = agents
-        self.env.set_agents(agents)
-        self.env.set_init_game_state(None)
+
+
         self.observation_space = spaces.Dict({'boards': spaces.Box(low=-1, high=25, shape=(11, 11, 13), dtype=np.float32)})
 
         self.action_space = self.env.action_space
-        self.env.reset()
+
 
     def set_phase(self, phase):
         print("learn phase " + str(phase))
