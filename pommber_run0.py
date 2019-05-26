@@ -49,7 +49,6 @@ def run():
         name="pommber_cm_lstm_103",
         checkpoint_freq=10,
         local_dir="./results",
-        resume=True,
         config={
             "num_workers": 7,
             "num_gpus": 1,

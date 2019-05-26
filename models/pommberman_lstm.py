@@ -39,20 +39,14 @@ class Pommberman(Model):
 
         inputs = input_dict["obs"]
         hiddens = [128]
-        fcnet_activation = options.get("fcnet_activation", "tanh")
-        if fcnet_activation == "tanh":
-            activation = tf.nn.tanh
-        elif fcnet_activation == "relu":
-            activation = tf.nn.relu
+        activation = tf.nn.relu
 
         vision_in = inputs['boards']
         metrics_in = inputs['states']
 
         with tf.name_scope("pommber_vision"):
-            vision_in = tf.transpose(vision_in, [0, 2, 3, 1])
             vision_in = slim.conv2d(vision_in, 32, [3, 3], 1, scope="conv_1")
             vision_in = slim.conv2d(vision_in, 16, [3, 3], 1, scope="conv_2")
-            vision_in = slim.conv2d(vision_in, 6, [3, 3], 1, scope="conv_3")
             vision_in = slim.flatten(vision_in)
 
         with tf.name_scope("pommber_metrics"):
@@ -70,18 +64,21 @@ class Pommberman(Model):
                 128,
                 weights_initializer=xavier_initializer(),
                 activation_fn=activation,
-                scope="middel")
+                scope="middel_1")
 
-            cell_size = 64
+            cell_size = 128
             last_layer = add_time_dimension(last_layer, self.seq_lens)
             lstm = tf.nn.rnn_cell.LSTMCell(cell_size, state_is_tuple=True)
             self.state_init = [
                 np.zeros(lstm.state_size.c, np.float32),
                 np.zeros(lstm.state_size.h, np.float32)
             ]
+
             if self.state_in:
                 c_in, h_in = self.state_in
+                print("Full")
             else:
+                print("Empty")
                 c_in = tf.placeholder(
                     tf.float32, [None, lstm.state_size.c], name="c")
                 h_in = tf.placeholder(
@@ -89,7 +86,7 @@ class Pommberman(Model):
                 self.state_in = [c_in, h_in]
 
             # Setup LSTM outputs
-    
+
             state_in = rnn.LSTMStateTuple(c_in, h_in)
             lstm_out, lstm_state = tf.nn.dynamic_rnn(
                 lstm,
