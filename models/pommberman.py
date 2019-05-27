@@ -12,11 +12,15 @@ class Pommberman(Model):
     def _build_layers_v2(self, input_dict, num_outputs, options):
 
         inputs = input_dict["obs"]
-        hiddens = [256]
+        hiddens = [128]
         activation = tf.nn.relu
         vision_in = inputs['boards']
+        metrics_in = inputs['states']
+
         with tf.name_scope("pommber_vision"):
-            vision_in = slim.conv2d(vision_in, 32, 1, 1, padding="valid", scope="conv_1")
+            vision_in = slim.conv2d(vision_in, 32, 1, 1, scope="conv_1")
+            vision_in = slim.conv2d(vision_in, 32, 1, 1, scope="conv_2")
+
             #vision_in = slim.conv2d(vision_in, 64, 3, 1, padding="valid", scope="conv_2")
             #vision_in = slim.conv2d(vision_in, 64, 3, 1, padding="valid", scope="conv_3")
             #vision_in = slim.conv2d(vision_in, 64, 3, 1, padding="valid", scope="conv_4")
@@ -24,10 +28,17 @@ class Pommberman(Model):
 
             vision_in = slim.flatten(vision_in)
 
+        with tf.name_scope("pommber_metrics"):
+            metrics_in = slim.fully_connected(
+                metrics_in,
+                64,
+                weights_initializer=xavier_initializer(),
+                activation_fn=activation,
+                scope="metrics_out")
 
         with tf.name_scope("pommber_out"):
             i = 0
-            last_layer = vision_in
+            last_layer = tf.concat([vision_in, metrics_in], axis=1)
             for size in hiddens:
                 last_layer = slim.fully_connected(
                     last_layer,

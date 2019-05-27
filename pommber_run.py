@@ -45,26 +45,27 @@ def run():
     sys.setrecursionlimit(56000)
     ray.shutdown()
     ray.init(num_gpus=1)
+    #ray.init()
     tune.run(
         PhasePPO,
-        name="pommber_cm_lstm_111",
+        name="pommber_cm",
         checkpoint_freq=10,
         local_dir="./results",
         config={
             "num_workers": 15,
             "num_gpus": 1,
-            "num_envs_per_worker": 16,
+            #"num_envs_per_worker": 16,
             "observation_filter": "MeanStdFilter",
             "batch_mode": "complete_episodes",
-            "train_batch_size": 16000,
-            "sgd_minibatch_size": 1600,
+            "train_batch_size": 8000,
+            "sgd_minibatch_size": 500,
             "vf_share_layers": True,
             "lr": 5e-4,
             "gamma": 0.997,
             "model": {
-                 "use_lstm": True,
-                 "max_seq_len": 60,
-                 "lstm_cell_size": 128,
+                 #"use_lstm": True,
+                 #"max_seq_len": 60,
+                 #"lstm_cell_size": 128,
                  "custom_model": "pommberman"},
             "env": "pommber_team",
             "callbacks": {
@@ -76,13 +77,15 @@ def run():
 def test():
     env = MultiAgend()
     env.set_phase(0)
+    env.reset()
     p = env.agents_index[0]
+    print(p)
+    print(env.step({p: 5})[0][p]['states'].shape)
 
-    env.step({p:1})
     f, x = plt.subplots(1,18,figsize=(36, 2))
-    for i, board in enumerate(env.step({p:1})[0][p]['boards']):
+    for i, board in enumerate(env.step({p: 1})[0][p]['boards']):
         x[i].imshow(board)
         x[i].axis("off")
     plt.show()
 
-test()
+run()
