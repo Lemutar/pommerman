@@ -77,17 +77,10 @@ def test():
     env = MultiAgend()
     env.set_phase(0)
     p = env.agents_index[0]
-    f, x = plt.subplots(1,13,figsize=(26, 2))
 
-    env.step({p:5})
-    env.step({p:0})
-    env.step({p:0})
-    env.step({p:0})
-    env.step({p:0})
-    env.step({p:0})
-    env.step({p:2})
-    env.step({p:2})
-    for i, board in enumerate(env.step({p:0})[0][p]['boards']):
+    env.step({p:1})
+    f, x = plt.subplots(1,18,figsize=(36, 2))
+    for i, board in enumerate(env.step({p:1})[0][p]['boards']):
         x[i].imshow(board)
         x[i].axis("off")
     plt.show()
