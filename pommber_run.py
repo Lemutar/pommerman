@@ -8,7 +8,6 @@ from envs.multi_agend import MultiAgend
 
 import models.pommberman_lstm
 import models.pommberman
-import matplotlib.pyplot as plt
 from agents.agents import BaseLineAgent, NoDoAgent, SuicidalAgent, RandomMoveAgent, Curiosity
 
 
@@ -44,16 +43,16 @@ def on_train_result(info):
 def run():
     sys.setrecursionlimit(56000)
     ray.shutdown()
-    ray.init(num_gpus=1)
-    #ray.init()
+    #ray.init(num_gpus=1)
+    ray.init()
     tune.run(
         PhasePPO,
         name="pommber_cm",
         checkpoint_freq=10,
         local_dir="./results",
         config={
-            "num_workers": 15,
-            "num_gpus": 1,
+            "num_workers": 1,
+            #"num_gpus": 1,
             #"num_envs_per_worker": 16,
             "observation_filter": "MeanStdFilter",
             "batch_mode": "complete_episodes",

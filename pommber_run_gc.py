@@ -5,9 +5,10 @@ from ray.rllib.agents.ppo import PPOAgent
 from ray import tune
 
 from envs.multi_agend import MultiAgend
+
 import models.pommberman_lstm
 import models.pommberman
-
+from agents.agents import BaseLineAgent, NoDoAgent, SuicidalAgent, RandomMoveAgent, Curiosity
 
 class PhasePPO(PPOAgent):
 
@@ -27,7 +28,10 @@ def on_train_result(info):
         trainer.train_phase  = 3
     elif result["episode_reward_mean"] > 0.95 and trainer.train_phase == 3:
         trainer.train_phase  = 4
-
+    elif result["episode_reward_mean"] > 0.95 and trainer.train_phase == 4:
+        trainer.train_phase  = 5
+    elif result["episode_reward_mean"] > 0.95 and trainer.train_phase == 5:
+        trainer.train_phase  = 6
 
     phase = trainer.train_phase
     trainer.optimizer.foreach_evaluator(
@@ -36,27 +40,31 @@ def on_train_result(info):
 
 
 def run():
-    sys.setrecursionlimit(1000)
+    sys.setrecursionlimit(56000)
     ray.shutdown()
-    ray.init(redis_address="localhost:6379")
-
+    ray.init(num_gpus=1)
+    #ray.init()
     tune.run(
         PhasePPO,
-        name="pommber_cm",
+        name="pommber_cm_42",
         checkpoint_freq=10,
         local_dir="./results",
         config={
-            "num_workers": 10,
+            "num_workers": 15,
             "num_gpus": 1,
-            "lr": 5e-4,
-            "num_envs_per_worker": 10,
+            "lambda": 0.95,
+            #"num_envs_per_worker": 16,
             "observation_filter": "MeanStdFilter",
             "batch_mode": "complete_episodes",
-            "train_batch_size": 32000,
-            "sgd_minibatch_size": 1000,
-            "entropy_coeff": 0.01,
-            "lambda": 0.95,
+            "train_batch_size": 12000,
+            "sgd_minibatch_size": 1200,
+            #"vf_share_layers": True,
+            "lr": .0001,
+            "gamma": 0.997,
             "model": {
+                 #"use_lstm": True,
+                 #"max_seq_len": 60,
+                 #"lstm_cell_size": 128,
                  "custom_model": "pommberman"},
             "env": "pommber_team",
             "callbacks": {
@@ -64,6 +72,4 @@ def run():
             },
         },
     )
-
 run()
-
