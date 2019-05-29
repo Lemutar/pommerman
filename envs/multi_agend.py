@@ -96,15 +96,15 @@ class MultiAgend(MultiAgentEnv):
                                     flames,
                                     teammate_pos,
                                     bomb_life,
-                                    bomb_blast_strength], axis=2),
+                                    bomb_blast_strength], axis=0),
                  'states': np.concatenate([ammo, blast_strength, can_kick, game_end]),}
 
 
         if self.last_featurize_obs == None:
-                featurize_obs =  {'boards': np.concatenate([actual_featurize_obs['boards'],actual_featurize_obs['boards']],axis=2),
+                featurize_obs =  {'boards': np.concatenate([actual_featurize_obs['boards'],actual_featurize_obs['boards']],axis=0),
                                   'states': np.concatenate([actual_featurize_obs['states'],actual_featurize_obs['states']]),}
         else:
-                featurize_obs =  {'boards': np.concatenate([self.last_featurize_obs['boards'],actual_featurize_obs['boards']],axis=2),
+                featurize_obs =  {'boards': np.concatenate([self.last_featurize_obs['boards'],actual_featurize_obs['boards']],axis=0),
                                   'states': np.concatenate([self.last_featurize_obs['states'],actual_featurize_obs['states']]),}
 
         self.last_featurize_obs = actual_featurize_obs
@@ -138,6 +138,30 @@ class MultiAgend(MultiAgentEnv):
             self.env._init_game_state = init_state
             self.env.reset()
 
+        if self.phase == 1:
+            arr= [0, 1]
+            random.shuffle(arr)
+            agents_index = arr.pop()
+            op_index = arr.pop()
+            self.agents_index = [agents_index]
+            self.enemies_agents_index = [op_index]
+            self.max_steps = 200
+            config = ffa_v0_fast_env()
+            config["env_kwargs"]["max_steps"] = self.max_steps
+            agents.insert(agents_index, BaseLineAgent(config["agent"](agents_index, config["game_type"])))
+            agents.insert(op_index, NoDoAgent(config["agent"](op_index, config["game_type"])))
+            self.env = Pomme(**config["env_kwargs"])
+            self.env.set_agents(agents)
+            init_state = {'board_size': '11', 'step_count': '0', 'board': '','agents': '[{"agent_id": 0, "is_alive": true, "position": [1, 1], "ammo": 1, "blast_strength": 2, "can_kick": false}, {"agent_id": 1, "is_alive": true, "position": [9, 0], "ammo": 1, "blast_strength": 2, "can_kick": false}]', 'bombs': '[]', 'flames': '[]', 'items': '[]', 'intended_actions': '[0, 0]'}
+            board = np.full((11, 11), 0)
+            board[5,:] = (np.ones(11) * 2)
+            agents_json = json.loads(copy.copy(init_state['agents']))
+            agents_json[0]["position"] = [random.randint(0, 4), random.randint(0, 10)]
+            agents_json[1]["position"] = [random.randint(6, 10), random.randint(0, 10)]
+            init_state['agents'] = json.dumps(agents_json)
+            init_state['board'] = json.dumps(board.tolist())
+            self.env._init_game_state = init_state
+            self.env.reset()
 
         self.observation_space = spaces.Dict({'boards': spaces.Box(low=-1, high=25, shape=(11, 11, 18), dtype=np.float32),
                                               'states': spaces.Box(low=-1, high=25, shape=(8,), dtype=np.float32)})
@@ -182,7 +206,7 @@ class MultiAgend(MultiAgentEnv):
         self.steps = 0
         self.phase = self.next_phase
         self.setup()
-        obs = self.env.reset()
+        obs = self.env.get_observations()
         return {i: self.featurize(obs[i]) for i in self.agents_index }
 
 

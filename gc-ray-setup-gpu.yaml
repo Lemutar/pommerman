@@ -58,7 +58,20 @@ auth:
 # For more documentation on available fields, see:
 # https://cloud.google.com/compute/docs/reference/rest/v1/instances/insert
 head_node:
-    machineType: n1-standard-16
+    machineType: n1-standard-8
+
+    scheduling:
+      onHostMaintenance: "terminate"
+      automaticRestart: true
+
+    guestAccelerators:
+      - acceleratorType: projects/tschu-bombs/zones/europe-west1-b/acceleratorTypes/nvidia-tesla-k80
+        acceleratorCount: 1
+
+    metadata:
+      items:
+        - key: install-nvidia-driver
+          value: "True"
 
     disks:
       - boot: true
@@ -109,7 +122,14 @@ file_mounts: {
 # List of commands that will be run before `setup_commands`. If docker is
 # enabled, these commands will run outside the container and before docker
 # is setup.
-initialization_commands: []
+initialization_commands:
+    # Wait until nvidia drivers are installed
+    - >-
+      timeout 300 bash -c "
+          command -v nvidia-smi && nvidia-smi
+          until [ \$? -eq 0 ]; do
+              command -v nvidia-smi && nvidia-smi
+          done"
 
 # List of shell commands to run to set up nodes.
 setup_commands:

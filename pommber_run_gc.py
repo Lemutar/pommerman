@@ -20,17 +20,17 @@ class PhasePPO(PPOAgent):
 def on_train_result(info):
     trainer = info["trainer"]
     result = info["result"]
-    if result["episode_reward_mean"] > 0.95 and trainer.train_phase == 0:
+    if result["episode_reward_mean"] > 0.80 and trainer.train_phase == 0:
         trainer.train_phase  = 1
-    elif result["episode_reward_mean"] > 0.95 and trainer.train_phase == 1:
+    elif result["episode_reward_mean"] > 0.80 and trainer.train_phase == 1:
         trainer.train_phase  = 2
-    elif result["episode_reward_mean"] > 0.95 and trainer.train_phase == 2:
+    elif result["episode_reward_mean"] > 0.80 and trainer.train_phase == 2:
         trainer.train_phase  = 3
-    elif result["episode_reward_mean"] > 0.95 and trainer.train_phase == 3:
+    elif result["episode_reward_mean"] > 0.80 and trainer.train_phase == 3:
         trainer.train_phase  = 4
-    elif result["episode_reward_mean"] > 0.95 and trainer.train_phase == 4:
+    elif result["episode_reward_mean"] > 0.80 and trainer.train_phase == 4:
         trainer.train_phase  = 5
-    elif result["episode_reward_mean"] > 0.95 and trainer.train_phase == 5:
+    elif result["episode_reward_mean"] > 0.80 and trainer.train_phase == 5:
         trainer.train_phase  = 6
 
     phase = trainer.train_phase
@@ -50,21 +50,21 @@ def run():
         checkpoint_freq=10,
         local_dir="./results",
         config={
-            "num_workers": 15,
+            "num_workers": 7,
             "num_gpus": 1,
             "lambda": 0.95,
             #"num_envs_per_worker": 16,
             "observation_filter": "MeanStdFilter",
             "batch_mode": "complete_episodes",
-            "train_batch_size": 12000,
-            "sgd_minibatch_size": 1200,
+            "train_batch_size": 24000,
+            "sgd_minibatch_size": 2400,
             #"vf_share_layers": True,
             "lr": .0001,
             "gamma": 0.997,
             "model": {
-                 #"use_lstm": True,
+                 "use_lstm": True,
                  #"max_seq_len": 60,
-                 #"lstm_cell_size": 128,
+                 "lstm_cell_size": 64,
                  "custom_model": "pommberman"},
             "env": "pommber_team",
             "callbacks": {

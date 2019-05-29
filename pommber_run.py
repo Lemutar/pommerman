@@ -8,6 +8,7 @@ from envs.multi_agend import MultiAgend
 
 import models.pommberman_lstm
 import models.pommberman
+import matplotlib.pyplot as plt
 from agents.agents import BaseLineAgent, NoDoAgent, SuicidalAgent, RandomMoveAgent, Curiosity
 
 
@@ -75,7 +76,7 @@ def run():
 
 def test():
     env = MultiAgend()
-    env.set_phase(0)
+    env.set_phase(1)
     env.reset()
     p = env.agents_index[0]
     print(p)
@@ -87,4 +88,4 @@ def test():
         x[i].axis("off")
     plt.show()
 
-run()
+test()

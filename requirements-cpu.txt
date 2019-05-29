@@ -8,3 +8,4 @@ rope
 click
 google-api-python-client
 cryptography
+keras
